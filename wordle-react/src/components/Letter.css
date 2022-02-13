@@ -1,0 +1,22 @@
+.Letter {
+    text-align: center;
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+}
+
+.unused {
+    background-color: #b9b5b5;
+}
+
+.correct {
+    background-color: #4ab64a;
+}
+
+.in-word {
+    background-color: #FFFF00;
+}
+
+.incorrect {
+    background-color: #5c5c5c;
+}

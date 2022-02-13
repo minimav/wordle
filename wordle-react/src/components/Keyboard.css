@@ -1,0 +1,22 @@
+.keyboard-row {
+    display: grid;
+    grid-column-gap: 5px;
+    grid-row-gap: 5px;
+    justify-content: center;
+    margin: 2px;
+}
+
+.key {
+    text-align: center;
+    height: 30px;
+    width: 20px;
+    line-height: 30px;
+}
+
+.not-incorrect {
+    background-color: #e0dbdb;
+}
+
+.incorrect {
+    background-color: #5c5c5c;
+}

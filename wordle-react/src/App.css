@@ -1,0 +1,14 @@
+.App {
+  text-align: center;
+}
+
+.word-grid {
+  display: grid;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+  justify-content: center;
+}
+
+.keyboard-ctn {
+  margin-top: 20px;
+}

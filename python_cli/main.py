@@ -6,13 +6,13 @@ import typing as tp
 
 
 class LetterStatus(Enum):
-    NOT_IN_WORD = "\U0000274C"
+    NOT_IN_WORD = "\U00002B1B"
     IN_WORD = "\U0001F7E8"
     CORRECT = "\U0001F7E9"
 
 
 ALL_LETTERS = string.ascii_lowercase
-with open("../words.txt") as f:
+with open("words.txt") as f:
     ALL_WORDS = set(word.rstrip("\n") for word in f.readlines())
 
 
@@ -29,19 +29,44 @@ class WordleGame:
         self.guesses: tp.List[str] = []
         self.emojis_per_guess: tp.List[str] = []
 
-    def check_letter(self, index, letter) -> LetterStatus:
+    def check_letter(
+        self, guess, index, num_already_flagged
+    ) -> tp.Dict[str, tp.Union[LetterStatus, int]]:
         """Check a single letter at a particular index."""
+        letter = guess[index]
         if self.target_word[index] == letter:
-            return LetterStatus.CORRECT
-        elif letter in self.target_word:
-            return LetterStatus.IN_WORD
-        else:
-            return LetterStatus.NOT_IN_WORD
+            return {"status": LetterStatus.CORRECT}
+        elif letter not in self.target_word:
+            return {"status": LetterStatus.NOT_IN_WORD}
 
-    def check_guess(self, word) -> tp.List[LetterStatus]:
+        num_this_letter_in_target = sum(
+            1 for target_letter in self.target_word if letter == target_letter
+        )
+        num_this_letter_correct = sum(
+            1
+            for guess_index, guess_letter in enumerate(guess)
+            if letter == guess_letter and self.target_word[guess_index] == guess_letter
+        )
+
+        if num_this_letter_in_target == num_this_letter_correct:
+            return {"status": LetterStatus.NOT_IN_WORD}
+        elif num_this_letter_in_target - num_this_letter_correct > num_already_flagged:
+            return {"status": LetterStatus.IN_WORD, "flagged": 1}
+        else:
+            return {"status": LetterStatus.NOT_IN_WORD, "flagged": 0}
+
+    def check_guess(self, guess) -> tp.List[LetterStatus]:
         """Check each letter in a valid guess."""
-        self.guesses.append(word)
-        return [self.check_letter(index, letter) for index, letter in enumerate(word)]
+        self.guesses.append(guess)
+        checks = []
+        # want to keep track of highlighted letters in case of multiple occurrences in the
+        # guess, e.g. 'zooms' guessed for target word 'hello', only one 'o' should be highlighted
+        num_already_flagged = {letter: 0 for letter in guess}
+        for index, letter in enumerate(guess):
+            check = self.check_letter(guess, index, num_already_flagged[letter])
+            num_already_flagged[letter] += check.get("flagged", 0)
+            checks.append(check["status"])
+        return checks
 
     def print_status(self) -> None:
         """Show guessed letter statuses and unused letters."""
